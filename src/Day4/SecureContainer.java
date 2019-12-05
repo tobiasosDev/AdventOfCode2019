@@ -8,7 +8,6 @@ public class SecureContainer {
 
     public static void main(String[] args) {
         SecureContainer secureContainer = new SecureContainer();
-//        System.out.println(secureContainer.validatePasswords(171309, 171310));
         System.out.println(secureContainer.validatePasswords(171309, 643603));
     }
 
@@ -16,7 +15,6 @@ public class SecureContainer {
         List<Integer> goodPasswords = new ArrayList<>();
         password: for (int i = start; i <= end; i++) {
             boolean hasDouble = false;
-            boolean hasTribbel = false;
             String password = String.valueOf(i);
             int lastDigit = 999999999;
             int lastLastDigit = 999999999;
@@ -41,7 +39,6 @@ public class SecureContainer {
                         doubleDigit.add(currentDigit);
                     }
                     if (lastLastDigit != 999999999 && (lastLastDigit == lastDigit && lastDigit == currentDigit)) {
-                        hasTribbel = true;
                         trippelDigit.add(currentDigit);
                     }
                 } else {

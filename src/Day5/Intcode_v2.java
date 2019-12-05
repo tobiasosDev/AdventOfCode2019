@@ -1,0 +1,172 @@
+package Day5;
+
+import java.util.Scanner;
+
+public class Intcode_v2 {
+
+    RAM ram;
+    Scanner sc;
+    int PC;
+
+    public static void main(String[] args) {
+        int inputs[]={3,225,1,225,6,6,1100,1,238,225,104,0,1101,81,30,225,1102,9,63,225,1001,92,45,224,101,-83,224,224,4,224,102,8,223,223,101,2,224,224,1,224,223,223,1102,41,38,225,1002,165,73,224,101,-2920,224,224,4,224,102,8,223,223,101,4,224,224,1,223,224,223,1101,18,14,224,1001,224,-32,224,4,224,1002,223,8,223,101,3,224,224,1,224,223,223,1101,67,38,225,1102,54,62,224,1001,224,-3348,224,4,224,1002,223,8,223,1001,224,1,224,1,224,223,223,1,161,169,224,101,-62,224,224,4,224,1002,223,8,223,101,1,224,224,1,223,224,223,2,14,18,224,1001,224,-1890,224,4,224,1002,223,8,223,101,3,224,224,1,223,224,223,1101,20,25,225,1102,40,11,225,1102,42,58,225,101,76,217,224,101,-153,224,224,4,224,102,8,223,223,1001,224,5,224,1,224,223,223,102,11,43,224,1001,224,-451,224,4,224,1002,223,8,223,101,6,224,224,1,223,224,223,1102,77,23,225,4,223,99,0,0,0,677,0,0,0,0,0,0,0,0,0,0,0,1105,0,99999,1105,227,247,1105,1,99999,1005,227,99999,1005,0,256,1105,1,99999,1106,227,99999,1106,0,265,1105,1,99999,1006,0,99999,1006,227,274,1105,1,99999,1105,1,280,1105,1,99999,1,225,225,225,1101,294,0,0,105,1,0,1105,1,99999,1106,0,300,1105,1,99999,1,225,225,225,1101,314,0,0,106,0,0,1105,1,99999,8,226,677,224,1002,223,2,223,1006,224,329,1001,223,1,223,7,226,226,224,102,2,223,223,1006,224,344,101,1,223,223,108,677,677,224,1002,223,2,223,1006,224,359,101,1,223,223,1107,226,677,224,1002,223,2,223,1005,224,374,101,1,223,223,1008,677,226,224,1002,223,2,223,1005,224,389,101,1,223,223,1007,677,226,224,1002,223,2,223,1005,224,404,1001,223,1,223,1107,677,226,224,1002,223,2,223,1005,224,419,1001,223,1,223,108,677,226,224,102,2,223,223,1006,224,434,1001,223,1,223,7,226,677,224,102,2,223,223,1005,224,449,1001,223,1,223,107,226,226,224,102,2,223,223,1006,224,464,101,1,223,223,107,677,226,224,102,2,223,223,1006,224,479,101,1,223,223,1007,677,677,224,1002,223,2,223,1006,224,494,1001,223,1,223,1008,226,226,224,1002,223,2,223,1006,224,509,101,1,223,223,7,677,226,224,1002,223,2,223,1006,224,524,1001,223,1,223,1007,226,226,224,102,2,223,223,1006,224,539,101,1,223,223,8,677,226,224,1002,223,2,223,1006,224,554,101,1,223,223,1008,677,677,224,102,2,223,223,1006,224,569,101,1,223,223,1108,677,226,224,102,2,223,223,1005,224,584,101,1,223,223,107,677,677,224,102,2,223,223,1006,224,599,1001,223,1,223,1108,677,677,224,1002,223,2,223,1006,224,614,1001,223,1,223,1107,677,677,224,1002,223,2,223,1005,224,629,1001,223,1,223,108,226,226,224,1002,223,2,223,1005,224,644,101,1,223,223,8,226,226,224,1002,223,2,223,1005,224,659,101,1,223,223,1108,226,677,224,1002,223,2,223,1006,224,674,101,1,223,223,4,223,99,226};
+        Intcode_v2 intcode_v2 = new Intcode_v2(inputs);
+        intcode_v2.run();
+    }
+
+    public Intcode_v2(int[] init) {
+        ram = new RAM(init);
+        sc = new Scanner(System.in);
+        PC=0;
+    }
+
+    public boolean run() {
+
+        while (controlModule()) {
+        }
+
+        return true;
+    }
+
+    private boolean controlModule() {
+        String opcode = Integer.toString(ram.getMemoryLoc(PC));
+        //Pad opcode to 5 digits
+        String zeros ="";
+        for (int i=0; i<(5-opcode.length()); i++) {
+            zeros+='0';
+        }
+
+        opcode = zeros+opcode;
+
+        //Pick actual instruction from the opcode
+        int instruction = Integer.parseInt(opcode.substring(3));
+
+        //Ugly hack
+        if (instruction == 3) {
+            opcode=opcode.replace('0', '1');
+        }
+
+        //Fetch parameters
+        int parA = 0;
+        int parB = 0;
+        int parC = 0;
+
+        if (instruction <10) {
+            if (opcode.charAt(2)== '1') {
+                parC=ram.getMemoryLoc(PC+1);
+            } else {
+                parC=ram.getMemoryLoc(ram.getMemoryLoc(PC+1));
+            }
+
+        }
+
+        if (instruction <3 || (instruction > 4 && instruction !=99)) {
+            if (opcode.charAt(1)== '1') {
+                parB=ram.getMemoryLoc(PC+2);
+            } else {
+                parB=ram.getMemoryLoc(ram.getMemoryLoc(PC+2));
+            }
+        }
+
+        if (instruction <3 || (instruction > 6 && instruction !=99)) {
+            parA=ram.getMemoryLoc(PC+3);
+        }
+
+
+        //Run the opcode
+
+        switch(instruction) {
+            case 1:
+                addition(parC, parB, parA);
+                break;
+            case 2:
+                multiplication(parC, parB, parA);
+                break;
+            case 3:
+                input(parC);
+                break;
+            case 4:
+                output(parC);
+                break;
+            case 5:
+                jumpIfTrue(parC, parB);
+                break;
+            case 6:
+                jumpIfNotTrue(parC, parB);
+                break;
+            case 7:
+                lessThan(parC,parB,parA);
+                break;
+            case 8:
+                equals(parC, parB, parA);
+                break;
+            case 99:
+                return false;
+        }
+
+        return true;
+    }
+
+    private void addition(int parC, int parB, int parA) {
+        int sum = parC + parB;
+        ram.setMemoryLoc(parA, sum);
+        PC+=4;
+    }
+
+    private void multiplication(int parC, int parB, int parA) {
+        int mult = parC * parB;
+        ram.setMemoryLoc(parA, mult);
+        PC+=4;
+    }
+
+    private void input(int address) {
+        System.out.println("Computer wants an input: ");
+        ram.setMemoryLoc(address, sc.nextInt());
+        PC+=2;
+    }
+
+    private void output(int value) {
+        System.out.println("Output from computer: " + value);
+        PC+=2;
+    }
+
+    private void jumpIfTrue(int parC, int parB) {
+        if(parC!=0) {
+            PC = parB;
+        } else {
+            PC+=3;
+        }
+    }
+
+    private void jumpIfNotTrue(int parC, int parB) {
+        if(parC==0) {
+            PC = parB;
+        } else {
+            PC+=3;
+        }
+
+    }
+
+    private void lessThan(int parC, int parB, int parA) {
+        if (parC < parB) {
+            ram.setMemoryLoc(parA, 1);
+        } else {
+            ram.setMemoryLoc(parA, 0);
+        }
+        PC+=4;
+    }
+
+    private void equals(int parC, int parB, int parA) {
+        if (parC == parB) {
+            ram.setMemoryLoc(parA, 1);
+        } else {
+            ram.setMemoryLoc(parA, 0);
+        }
+        PC+=4;
+    }
+
+    public int readRAM(int address) {
+        return ram.getMemoryLoc(address);
+    }
+
+}
